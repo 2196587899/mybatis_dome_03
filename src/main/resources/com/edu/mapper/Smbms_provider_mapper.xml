@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edu.mapper.Smbms_provider_mapper">
+
+    <!--实验三-->
+    <!--2.运用 MyBatis 框架向供应商表中新增一条供应商信息（数据可自拟），同时获取数据库中新增记录的主键 id 值-->
+    <!--insert into smbms_provider values (#{proCode},#{proName},#{proDesc},#{proContact},#{proPhone},#{proAddress},#{proFax},#{createdBy},#{creationDate},#{modifyDate},#{modifyBy})-->
+    <insert id="insertProvider" parameterType="com.edu.pojo.Smbms_provider"  keyProperty="id" useGeneratedKeys="true">
+        insert into smbms_provider(proName) values(#{proName})
+    </insert>
+
+    <update id="updateProvider" parameterType="com.edu.pojo.Smbms_provider">
+        update  smbms_provider  set proContact=#{proContact}, proPhone=#{proPhone},modifyDate=#{modifyDate},modifyBy=#{modifyBy} where proName=#{proName}
+    </update>
+
+    <delete id="deleteProName" parameterType="string">
+        delete from smbms_provider where proName=#{proName}
+    </delete>
+
+    <!--根据商品ID查询商品信息-->
+    <select id="findByProCode" resultType="map" parameterType="string">
+        select proName,proContact,proPhone from smbms_provider where proCode=#{str}
+    </select>
+
+    <!--根据供应商地址查询信息-->
+    <select id="findByProAddress" resultType="map" parameterType="string">
+        select proName from smbms_provider where proAddress like '%' #{str} '%'
+    </select>
+
+    <!--据供应商地址和主营产品 查询信息-->
+    <select id="findByProAddressAndProDesc" resultType="map" parameterType="map">
+        select proName,proDesc from smbms_provider where proAddress like '%' #{proAddress} '%' and proDesc like '%' #{proDesc} '%'
+    </select>
+
+    <!--连表查询-->
+    <select id="findByTotalPrice" resultType="map" parameterType="map">
+        select billCode,productName,totalPrice,proName from smbms_bill b, smbms_provider p where b.providerId=p.id and totalPrice >=#{num}
+    </select>
+
+
+    <!--连表查询-->
+    <select id="findNumByProName" resultType="int" parameterType="string">
+        select count(*) from smbms_bill b, smbms_provider p where b.providerId=p.id and  proName=#{str}
+    </select>
+
+    <!--第三个-->
+    <resultMap id="ProviderAndBillMap" type="com.edu.pojo.Smbms_provider">
+
+        <result property="proCode" column="proCode"/>
+        <result property="proName" column="proName"/>
+        <result property="proPhone" column="proPhone"/>
+        <result property="proContact" column="proContact"/>
+        <collection property="smbmsBill"  javaType="ArrayList" ofType="com.edu.pojo.SmbmsBill" >
+
+            <result property="billCode" column="billCode"/>
+            <result property="productName" column="productName"/>
+            <result property="totalPrice" column="totalPrice"/>
+            <result property="isPayment" column="isPayment"/>
+        </collection>
+    </resultMap>
+    <select id="findProviderAndBill" resultMap="ProviderAndBillMap" parameterType="string">
+            select
+               b.billCode,
+               b.productName,
+               p.proCode,
+               p.proName,
+               p.proPhone,
+               p.proContact,
+               b.totalPrice,
+               b.isPayment
+        from smbms_provider p
+            left join smbms_bill b on b.providerId=p.id
+                where p.proAddress like concat("%",#{str},"%");
+    </select>
+</mapper>

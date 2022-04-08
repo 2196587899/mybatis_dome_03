@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edu.mapper.NewsMapper">
+
+    <resultMap id="newsMap" type="com.edu.pojo.News">
+        <id column="id" property="id"/>
+        <result column="createTime" property="create_time"/>
+        <result column="updateTime" property="update_time"/>
+        <result column="title" property="title"/>
+        <result column="status" property="status"/>
+        <result column="userId" property="user_id"/>
+        <result column="content" property="content"/>
+    </resultMap>
+
+    <select id="findNewsByTSE" resultMap="newsMap" parameterType="com.edu.pojo.NewsCnd">
+        select * from news
+        <trim prefix="where" prefixOverrides="and">
+            <if test="title!=null">
+               and title like concat("%",#{title},"%")
+            </if>
+            <if test="status!=null">
+                and status=#{status}
+            </if>
+            <if test="startTime!=null and endTime!=null">
+                and create_time between #{startTime} and #{endTime}
+            </if>
+        </trim>
+    </select>
+
+    <select id="findNewsByIn" resultMap="newsMap" parameterType="list">
+        select * from news where title
+        <foreach collection="list" item="item" open="in(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+    
+    <insert id="insertNews" parameterType="list" >
+        insert into news values
+        <foreach collection="list" item="item" separator=",">
+             (#{item.id},#{item.createTime}, #{item.updateTime}, #{item.title}, #{item.status}, #{item.userId},#{item.content})
+        </foreach>
+    </insert>
+
+    <update id="updateNews" parameterType="string">
+        update news
+        <set>
+            title='天玑 9000，售价 5799 元' ,status=2
+        </set>
+        <where>
+            <if test= "title=='首款天玑9000手机正式官宣，3月18日开卖，售价5799元，期待吗？'">
+                title=#{str}
+            </if>
+        </where>
+    </update>
+</mapper>
