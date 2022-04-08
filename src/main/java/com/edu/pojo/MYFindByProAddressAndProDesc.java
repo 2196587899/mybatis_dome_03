@@ -7,6 +7,7 @@ public class MYFindByProAddressAndProDesc {
     private String proDesc22 ;
     private String proDesc1 ;
     private String proDesc3 ;
+    private String fas;
     public String getProName() {
         return proName;
     }
