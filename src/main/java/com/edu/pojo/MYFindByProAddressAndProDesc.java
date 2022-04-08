@@ -3,8 +3,8 @@ package com.edu.pojo;
 public class MYFindByProAddressAndProDesc {
    private String proName;
    private String proDesc ;
-    private String proDesc1 ;
-    private String proDesc2 ;
+    private String proDesc21 ;
+    private String proDesc22 ;
     public String getProName() {
         return proName;
     }
